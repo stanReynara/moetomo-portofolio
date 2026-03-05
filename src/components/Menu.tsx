@@ -15,6 +15,7 @@ export default function Menu() {
         height={240}
         className="object-cover w-full h-auto rounded-b-2xl"
       />
+      
     </div>
   );
 }

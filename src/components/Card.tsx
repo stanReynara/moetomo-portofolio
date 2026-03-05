@@ -18,7 +18,7 @@ export default function Card({
   return (
     <div className="card relative bg-base-300 w-96 rounded-2xl border border-base-200">
       <div className="card-body p-8">
-        <h2 className="card-title text-2xl font-bold">{title}</h2>
+        <h2 className="card-title text-2xl font-bold base-content">{title}</h2>
         <p className="text-sm text-gray-500 leading-relaxed">
           {description}
         </p>
