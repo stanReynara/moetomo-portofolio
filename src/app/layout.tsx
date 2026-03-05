@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="light">
+    <html lang="en" data-theme="pastel">
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml"></link>
       </head>
