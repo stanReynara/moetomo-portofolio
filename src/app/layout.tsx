@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   title: "Moetomo",
   description: "Moetomo's Portfolio",
   openGraph: {
+    title: "Moetomo",
+    description: "Moetomo's Portfolio",
     images: [
       {
         url: '/api/og?title=Moetomo%20Portofolio',
@@ -26,6 +28,7 @@ export const metadata: Metadata = {
         height: 630,
       },
     ],
+    themeColor: '#E91E63',
   },
 };
 
