@@ -15,8 +15,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://moetomo-portofolio.stanleyreynara.workers.dev'),
   title: "Moetomo",
   description: "Moetomo's Portfolio",
+  openGraph: {
+    images: '/opengraph-image.png', // Next.js will now prefix this with your metadataBase
+  },
 };
 
 export default function RootLayout({
