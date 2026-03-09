@@ -28,8 +28,8 @@ export const metadata: Metadata = {
         height: 630,
       },
     ],
-    themeColor: '#E91E63',
   },
+  themeColor: '#E91E63',
 };
 
 export default function RootLayout({
