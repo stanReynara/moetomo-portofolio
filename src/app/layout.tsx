@@ -19,7 +19,13 @@ export const metadata: Metadata = {
   title: "Moetomo",
   description: "Moetomo's Portfolio",
   openGraph: {
-    images: '/opengraph-image.png', // Next.js will now prefix this with your metadataBase
+    images: [
+      {
+        url: '/api/og?title=Moetomo%20Portofolio',
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
 };
 
