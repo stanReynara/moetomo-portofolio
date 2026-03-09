@@ -1,11 +1,11 @@
 // app/api/og/route.tsx
 import { ImageResponse } from '@vercel/og';
 
-export const runtime = 'edge'; // MUST be edge for Cloudflare
+export const runtime = 'edge';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const title = searchParams.get('title') || 'My Website';
+  const title = searchParams.get('title') || 'Moetomo Portofolio';
 
   return new ImageResponse(
     (
