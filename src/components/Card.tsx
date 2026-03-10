@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { FaTwitter, FaInstagram, FaFacebook } from "react-icons/fa";
+import { FaTwitter, FaInstagram } from "react-icons/fa";
 
 export default function Card({
   title,
