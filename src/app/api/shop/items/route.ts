@@ -3,36 +3,18 @@ import { drizzle } from "drizzle-orm/d1";
 import { eq, isNull } from "drizzle-orm";
 import * as schema from "@/db/schema";
 
-export const runtime = "edge";
-
 export async function GET() {
-  try {
-    const { env } = await getCloudflareContext();
-    
-    // Check 1: Is the database actually connected?
-    if (!env.DB) {
-      return Response.json({ error: "FATAL: env.DB binding is missing or undefined" }, { status: 500 });
-    }
+  const { env } = await getCloudflareContext();
+  const db = drizzle(env.DB, { schema });
 
-    const db = drizzle(env.DB, { schema });
+  // Only select items where deletedAt has no value
+  const result = await db
+    .select()
+    .from(schema.items)
+    .where(isNull(schema.items.deletedAt))
+    .all();
 
-    // Check 2: Can Drizzle query the tables?
-    const result = await db
-      .select()
-      .from(schema.items)
-      .where(isNull(schema.items.deletedAt))
-      .all();
-
-    return Response.json(result);
-
-  } catch (error: any) {
-    // Check 3: Catch any SQLite or D1 execution errors
-    return Response.json({ 
-      error: "Query Failed", 
-      message: error.message,
-      stack: error.stack
-    }, { status: 500 });
-  }
+  return Response.json(result);
 }
 
 export async function POST(request: Request) {
