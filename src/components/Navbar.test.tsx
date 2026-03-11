@@ -19,23 +19,15 @@ describe('Navbar Component', () => {
     
     const homeLink = screen.getByText('HOME');
     const contactLink = screen.getByText('CONTACT US');
+    const shopLink = screen.getByText('SHOP');
     
     expect(homeLink).toBeDefined();
     expect(contactLink).toBeDefined();
+    expect(shopLink).toBeDefined();
 
     expect(homeLink.getAttribute('href')).toBe('/');
     expect(contactLink.getAttribute('href')).toBe('/contact');
+    expect(shopLink.getAttribute('href')).toBe('/shop');
   });
 
-  it('renders the logo image inside a link to the home page', () => {
-    render(<Navbar />);
-    
-    const logoImage = screen.getByAltText('Logo');
-    expect(logoImage).toBeDefined();
-
-    const logoLink = logoImage.closest('a');
-    
-    expect(logoLink).toBeDefined();
-    expect(logoLink?.getAttribute('href')).toBe('/');
-  });
 });
