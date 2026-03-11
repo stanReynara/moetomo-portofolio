@@ -37,7 +37,7 @@
 	},
 	"d1_databases": [
 		{
-			"binding": "moetomo_db",
+			"binding": "DB",
 			"database_name": "moetomo-db",
 			"database_id": "ed684aaa-8f1f-4c09-b900-c58ede8b04b8"
 		}
