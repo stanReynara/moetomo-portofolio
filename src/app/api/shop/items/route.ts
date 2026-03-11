@@ -3,22 +3,32 @@ import { drizzle } from "drizzle-orm/d1";
 import { eq, isNull } from "drizzle-orm";
 import * as schema from "@/db/schema";
 
-export async function GET() {
-  const { env } = await getCloudflareContext();
-  const db = drizzle(env.DB, { schema });
+export const dynamic = "force-dynamic";
 
-  // Only select items where deletedAt has no value
-  const result = await db
-    .select()
-    .from(schema.items)
-    .where(isNull(schema.items.deletedAt))
-    .all();
+export async function GET(request: Request) {
+  try {
+    const { env } = await getCloudflareContext({ async: true });
+    
+    if (!env.DB) {
+      return Response.json({ error: "Database binding missing" }, { status: 500 });
+    }
 
-  return Response.json(result);
+    const db = drizzle(env.DB, { schema });
+
+    const result = await db
+      .select()
+      .from(schema.items)
+      .where(isNull(schema.items.deletedAt))
+      .all();
+
+    return Response.json(result);
+  } catch (error: any) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {
-  const { env } = await getCloudflareContext();
+  const { env } = await getCloudflareContext({ async: true });
   const db = drizzle(env.DB, { schema });
 
   type NewItem = typeof schema.items.$inferInsert;
@@ -30,7 +40,7 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const { env } = await getCloudflareContext();
+  const { env } = await getCloudflareContext({ async: true });
   const db = drizzle(env.DB, { schema });
 
   type UpdateItem = Partial<typeof schema.items.$inferInsert> & { id: number };
@@ -54,7 +64,7 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const { env } = await getCloudflareContext();
+  const { env } = await getCloudflareContext({ async: true });
   const db = drizzle(env.DB, { schema });
 
   type UpdateItem = Partial<typeof schema.items.$inferInsert> & { id: number };
