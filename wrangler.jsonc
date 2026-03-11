@@ -39,8 +39,10 @@
 		{
 			"binding": "DB",
 			"database_name": "moetomo-db",
-			"database_id": "ed684aaa-8f1f-4c09-b900-c58ede8b04b8"
-		}
+			"database_id": "ad78a1c3-c6da-416d-a8db-d7b49c3aacc5",
+			"preview_database_id": "5d4cb360-0469-404e-98fc-8bb44163ee6c",
+			"migrations_dir": "./drizzle"
+		},
 	],
 	/**
 	 * Smart Placement
