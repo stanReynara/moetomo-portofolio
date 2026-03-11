@@ -2,15 +2,28 @@ import Image from "next/image";
 
 export default function Hero() {
   return (
-    <div className="hero relative w-full">
-      <Image
-        src="/hero.png"
-        alt="Hero Banner"
-        width={1920} // Use the actual width of your image
-        height={600}  // Use the actual height of your image
-        className="w-full h-auto" // Forces width to 100% and scales height automatically
-        priority // Ensures the hero loads fast
-      />
+    <div className="flex flex-col w-full">
+      
+      <div className="py-4 px-6 bg-white w-full flex justify-center"> 
+        <Image
+          src="/logo.png"
+          alt="Logo"
+          width={256}
+          height={48}
+        />
+      </div>
+
+      <div className="relative w-full">
+        <Image
+          src="/hero.png"
+          alt="Hero Banner"
+          width={1920}
+          height={600}
+          className="w-full h-auto block"
+          priority
+        />
+      </div>
+      
     </div>
   );
 }
