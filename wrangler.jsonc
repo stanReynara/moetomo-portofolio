@@ -44,6 +44,25 @@
 			"migrations_dir": "./drizzle"
 		},
 	],
+	"env": {
+    "development": {
+      "name": "development-moetomo-portofolio",
+      "services": [
+        {
+          "binding": "WORKER_SELF_REFERENCE",
+          "service": "development-moetomo-portofolio"
+        }
+      ],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "moetomo-db-preview",
+          "database_id": "5d4cb360-0469-404e-98fc-8bb44163ee6c",
+          "migrations_dir": "./drizzle"
+        }
+      ]
+    }
+  }
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
