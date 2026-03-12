@@ -15,6 +15,27 @@
       "when": 1773212298655,
       "tag": "0001_sticky_thunderball",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1773282264238,
+      "tag": "0002_open_nomad",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1773312479844,
+      "tag": "0003_lumpy_husk",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1773313000163,
+      "tag": "0004_clean_joshua_kane",
+      "breakpoints": true
     }
   ]
 }
