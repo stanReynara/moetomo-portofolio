@@ -17,7 +17,10 @@ export const items = sqliteTable("items", {
 // 2. The new artists table
 export const artists = sqliteTable("artists", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull().unique(), // Unique prevents duplicate artists
+  name: text("name").notNull().unique(),
+  avatar: text("avatar"), // URL to the artist's avatar image
+  polaroid: text("polaroid"), // URL to the artist's polaroid image
+  description: text("description"), // A short bio or description of the artist
   socials: text("socials", { mode: "json" }).$type<Record<string, string>>(), // e.g., { "instagram": "link", "twitter": "link" }
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()

@@ -10,10 +10,7 @@ export default function Polaroid({
   title: string;
   description: string;
   imageSrc: string;
-  socials: {
-    twitter: string;
-    instagram: string;
-  };
+  socials: Record<string, string>; // e.g., { "instagram": "link", "twitter": "link" }
 }) {
   return (
     <div className="card w-64 bg-base-100 shadow-xl p-3 border border-base-300 transform hover:scale-105 transition-transform duration-300">
@@ -32,12 +29,16 @@ export default function Polaroid({
         <p className="text-sm text-base-content/70 italic mb-3">{description}</p>
         
         <div className="flex justify-center space-x-4">
-          <a href={socials.twitter} className="btn btn-ghost btn-circle btn-sm hover:text-blue-400">
-            <FaTwitter size={20} />
-          </a>
-          <a href={socials.instagram} className="btn btn-ghost btn-circle btn-sm hover:text-pink-500">
-            <FaInstagram size={20} />
-          </a>
+          {socials.instagram && (
+            <a href={socials.instagram} target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-pink-500">
+              <FaInstagram size={20} />
+            </a>
+          )}
+          {socials.twitter && (
+            <a href={socials.twitter} target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-blue-400">
+              <FaTwitter size={20} />
+            </a>
+          )}
         </div>
       </div>
     </div>
