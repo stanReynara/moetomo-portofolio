@@ -1,5 +1,4 @@
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
 import PolaroidGallery from "@components/PolaroidGallery";
 import Hero from "@components/Hero";
 import Menu from "@components/Menu";
