@@ -1,5 +1,5 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
-import { sql } from "drizzle-orm";
+import { sqliteTable, text, integer, primaryKey } from "drizzle-orm/sqlite-core";
+import { sql, relations } from "drizzle-orm";
 
 export const items = sqliteTable("items", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -13,6 +13,33 @@ export const items = sqliteTable("items", {
     .default(sql`(unixepoch())`),
   deletedAt: integer("deleted_at", { mode: "timestamp" }),
 });
+
+// 2. The new artists table
+export const artists = sqliteTable("artists", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull().unique(),
+  avatar: text("avatar"), // URL to the artist's avatar image
+  polaroid: text("polaroid"), // URL to the artist's polaroid image
+  description: text("description"), // A short bio or description of the artist
+  socials: text("socials", { mode: "json" }).$type<Record<string, string>>(), // e.g., { "instagram": "link", "twitter": "link" }
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  deletedAt: integer("deleted_at", { mode: "timestamp" }),
+});
+
+// 3. The Junction Table
+export const itemArtists = sqliteTable("item_artists", {
+  itemId: integer("item_id")
+    .notNull()
+    .references(() => items.id, { onDelete: 'cascade' }),
+  artistId: integer("artist_id")
+    .notNull()
+    .references(() => artists.id, { onDelete: 'cascade' }),
+}, (t) => ({
+  // Composite primary key ensures an artist can't be linked to the same item twice
+  pk: primaryKey({ columns: [t.itemId, t.artistId] }), 
+}));
 
 export const orders = sqliteTable("orders", {
   // Use UUID instead
@@ -38,3 +65,24 @@ export const orderItems = sqliteTable("order_items", {
   quantity: integer("quantity").notNull(),
   priceAtTime: integer("price_at_time").notNull(), 
 });
+
+// Relations
+
+export const itemsRelations = relations(items, ({ many }) => ({
+  itemArtists: many(itemArtists),
+}));
+
+export const artistsRelations = relations(artists, ({ many }) => ({
+  itemArtists: many(itemArtists),
+}));
+
+export const itemArtistsRelations = relations(itemArtists, ({ one }) => ({
+  item: one(items, {
+    fields: [itemArtists.itemId],
+    references: [items.id],
+  }),
+  artist: one(artists, {
+    fields: [itemArtists.artistId],
+    references: [artists.id],
+  }),
+}));

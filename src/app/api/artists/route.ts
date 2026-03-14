@@ -17,8 +17,8 @@ export async function GET(request: Request) {
 
     const result = await db
       .select()
-      .from(schema.items)
-      .where(isNull(schema.items.deletedAt))
+      .from(schema.artists)
+      .where(isNull(schema.artists.deletedAt))
       .all();
 
     return Response.json(result);
@@ -31,10 +31,10 @@ export async function POST(request: Request) {
   const { env } = await getCloudflareContext({ async: true });
   const db = drizzle(env.DB, { schema });
 
-  type NewItem = typeof schema.items.$inferInsert;
-  const body = (await request.json()) as NewItem;
+  type NewArtist = typeof schema.artists.$inferInsert;
+  const body = (await request.json()) as NewArtist;
 
-  const result = await db.insert(schema.items).values(body).returning();
+  const result = await db.insert(schema.artists).values(body).returning();
 
   return Response.json(result);
 }
@@ -43,21 +43,21 @@ export async function PATCH(request: Request) {
   const { env } = await getCloudflareContext({ async: true });
   const db = drizzle(env.DB, { schema });
 
-  type UpdateItem = Partial<typeof schema.items.$inferInsert> & { id: number };
+  type UpdateArtist = Partial<typeof schema.artists.$inferInsert> & { id: number };
   
   // 2. Parse the body and separate the ID from the fields being updated
-  const body = (await request.json()) as UpdateItem;
+  const body = (await request.json()) as UpdateArtist;
   const { id, ...updateData } = body;
 
   if (!id) {
-    return Response.json({ error: "Missing item ID" }, { status: 400 });
+    return Response.json({ error: "Missing artist ID" }, { status: 400 });
   }
 
   // 3. Perform the update
   const result = await db
-    .update(schema.items)
+    .update(schema.artists)
     .set(updateData)
-    .where(eq(schema.items.id, id))
+    .where(eq(schema.artists.id, id))
     .returning();
 
   return Response.json(result);
@@ -67,21 +67,18 @@ export async function DELETE(request: Request) {
   const { env } = await getCloudflareContext({ async: true });
   const db = drizzle(env.DB, { schema });
 
-  type UpdateItem = Partial<typeof schema.items.$inferInsert> & { id: number };
+  type DeleteArtist = { id: number };
+  const body = (await request.json()) as DeleteArtist;
 
-  // 2. Parse the body and separate the ID from the fields being updated
-  const body = (await request.json()) as UpdateItem;
-  const { id, ...updateData } = body;
-
-  if (!id) {
-    return Response.json({ error: "Missing item ID" }, { status: 400 });
+  if (!body.id) {
+    return Response.json({ error: "Missing artist ID" }, { status: 400 });
   }
 
-  // Perform a soft delete by updating the deletedAt timestamp
+  // Soft delete by setting deletedAt to current timestamp
   const result = await db
-    .update(schema.items)
-    .set({ deletedAt: new Date() }) 
-    .where(eq(schema.items.id, id))
+    .update(schema.artists)
+    .set({ deletedAt: new Date() })
+    .where(eq(schema.artists.id, body.id))
     .returning();
 
   return Response.json(result);
