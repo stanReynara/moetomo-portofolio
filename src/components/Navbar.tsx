@@ -1,9 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <div className="navbar bg-base-100">
+    <div className="navbar bg-base-100 px-12 md:px-24">
       <div className="navbar-start">
         <Link 
           href="/" 
@@ -12,7 +11,7 @@ export default function Navbar() {
                     after:origin-center after:scale-x-0 after:bg-gray-400 
                     after:shadow-[0_5px_10px_rgba(156,163,175,0.8)]
                     after:transition-transform after:duration-300 after:content-[''] 
-                    hover:after:scale-x-100"
+                    hover:after:scale-x-100 "
         >
           HOME
         </Link>
