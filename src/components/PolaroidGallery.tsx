@@ -5,7 +5,7 @@ import { artists } from "@/db/schema";
 import { getCloudflareContext } from "@opennextjs/cloudflare"; 
 
 export default async function PolaroidGallery() {
-  const { env } = await getCloudflareContext();
+  const { env } = await getCloudflareContext({ async: true });
 
   const db = getDb(env);
   // Fetch all artists with deletedAt = null
@@ -16,7 +16,7 @@ export default async function PolaroidGallery() {
       {fetchedArtists.map((artist) => (
         <Polaroid 
           key={artist.id} 
-          title={artist.name} 
+        title={artist.name} 
           description={artist.description || ""} 
           imageSrc={artist.polaroid || "/"} 
           socials={artist.socials || {}} 
