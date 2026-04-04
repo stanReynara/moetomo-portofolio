@@ -61,7 +61,7 @@
         }
       ]
     }
-  }
+  },
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
@@ -79,5 +79,5 @@
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
 	 */
-	// "vars": {  "MY_VARIABLE": "production_value" }
+	"vars": {  "BETTER_AUTH_URL": "https://moetomo-portofolio.stanleyreynara.workers.dev" }
 }
