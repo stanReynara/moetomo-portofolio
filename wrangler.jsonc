@@ -46,11 +46,10 @@
 	],
 	"env": {
     "development": {
-      "name": "development-moetomo-portofolio",
       "services": [
         {
           "binding": "WORKER_SELF_REFERENCE",
-          "service": "development-moetomo-portofolio"
+          "service": "moetomo-portofolio"
         }
       ],
       "d1_databases": [

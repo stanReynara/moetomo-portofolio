@@ -1,0 +1,1 @@
+ALTER TABLE `items` ADD `artist` text DEFAULT '[]' NOT NULL;
