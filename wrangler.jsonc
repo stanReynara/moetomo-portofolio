@@ -44,6 +44,13 @@
 			"migrations_dir": "./drizzle"
 		},
 	],
+	"r2_buckets": [
+		{
+			"binding": "BUCKET",
+			"bucket_name": "moetomo-bucket",
+			"preview_bucket_name": "moetomo-bucket-preview"
+		}
+	],
 	"env": {
     "development": {
       "services": [
