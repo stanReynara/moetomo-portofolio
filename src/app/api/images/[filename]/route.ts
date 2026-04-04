@@ -3,10 +3,12 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { filename: string } }
+  context: { params: Promise<{ filename: string }> } // 1. Type params as a Promise
 ) {
   const { env } = await getCloudflareContext({ async: true });
-  const filename = params.filename;
+  
+  // 2. Await the params before extracting filename
+  const { filename } = await context.params; 
 
   // 1. Fetch the object from the bound R2 bucket
   const object = await env.BUCKET.get(filename);
