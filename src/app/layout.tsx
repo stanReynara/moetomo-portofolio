@@ -25,7 +25,19 @@ export const metadata: Metadata = {
     description: "Moetomo's Portfolio",
     images: [
       {
-        url: '/api/og?title=Moetomo%20Portofolio',
+        url: 'https://pub-92760cc6862345509bd9b0867e90c2c6.r2.dev/opengraph-image.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Moetomo",
+    description: "Moetomo's Portfolio",
+    images: [
+      {
+        url: 'https://pub-92760cc6862345509bd9b0867e90c2c6.r2.dev/opengraph-image.png',
         width: 1200,
         height: 630,
       },
