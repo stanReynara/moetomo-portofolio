@@ -85,8 +85,6 @@ export const artists = sqliteTable("artists", {
   deletedAt: integer("deleted_at", { mode: "timestamp" }),
 });
 
-
-
 // 3. The Junction Table
 export const itemArtists = sqliteTable("item_artists", {
   itemId: integer("item_id")
