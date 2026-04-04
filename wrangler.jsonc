@@ -79,5 +79,5 @@
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
 	 */
-	"vars": {  "BETTER_AUTH_URL": "https://moetomo-portofolio.stanleyreynara.workers.dev" }
+	// "vars": {  "BETTER_AUTH_URL": "https://moetomo-portofolio.stanleyreynara.workers.dev" }
 }
