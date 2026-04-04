@@ -3,7 +3,6 @@ import { drizzle } from "drizzle-orm/d1";
 import { desc, count } from "drizzle-orm";
 import * as schema from "@db/schema";
 
-export const runtime = "edge"; // Run this page on the Edge for faster response times
 export const dynamic = "force-dynamic"; // Ensures the dashboard always shows fresh data
 
 export default async function AdminDashboard() {
