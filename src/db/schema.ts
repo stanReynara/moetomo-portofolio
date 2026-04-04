@@ -60,7 +60,18 @@ export const items = sqliteTable("items", {
   deletedAt: integer("deleted_at", { mode: "timestamp" }),
 });
 
-// 2. The new artists table
+export const menus = sqliteTable("menus", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  description: text("description"),
+  imageUrl: text("image_url"),
+  redirectUrl: text("redirect_url"),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  deletedAt: integer("deleted_at", { mode: "timestamp" }),
+});
+
 export const artists = sqliteTable("artists", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull().unique(),
@@ -73,6 +84,8 @@ export const artists = sqliteTable("artists", {
     .default(sql`(unixepoch())`),
   deletedAt: integer("deleted_at", { mode: "timestamp" }),
 });
+
+
 
 // 3. The Junction Table
 export const itemArtists = sqliteTable("item_artists", {

@@ -1,7 +1,7 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { drizzle } from "drizzle-orm/d1";
 import { desc, count } from "drizzle-orm";
-import * as schema from "@db/schema"; // Make sure this path matches your setup
+import * as schema from "@db/schema";
 
 export const runtime = "edge"; // Run this page on the Edge for faster response times
 export const dynamic = "force-dynamic"; // Ensures the dashboard always shows fresh data
