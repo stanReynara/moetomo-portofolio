@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { authClient } from "@/lib/auth-client"; 
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
 export default function TempAdminSetup() {
@@ -15,21 +15,45 @@ export default function TempAdminSetup() {
     e.preventDefault();
     setLoading(true);
 
-    const { data, error } = await authClient.signUp.email({
-      email,
-      password,
-      name,
-    });
+    console.log("Attempting to create admin account for:", email);
 
-    if (error) {
-      alert(`Error creating admin: ${error.message}`);
+    try {
+      const { data, error } = await authClient.signUp.email({
+        email,
+        password,
+        name,
+      });
+
+      // 1. Check for expected Better Auth API errors
+      if (error) {
+        console.error("🚨 BETTER AUTH API ERROR 🚨");
+        console.error("Full Error Object:", JSON.stringify(error, null, 2));
+        console.error("Status:", error.status);
+        console.error("Code:", error.code);
+
+        // Provide a fallback if error.message is undefined
+        const errorMessage =
+          error.message || "Check browser console for exact details.";
+        alert(`Error creating admin: ${errorMessage}`);
+
+        setLoading(false);
+        return;
+      }
+
+      // 2. Success state
+      if (data) {
+        console.log("✅ Success! Admin created. Returned data:", data);
+        alert("Admin account created successfully! Check your D1 database.");
+        router.push("/"); // Redirect home after success
+      }
+    } catch (err) {
+      // 3. Catch unexpected network failures or edge crashes
+      console.error("💥 UNEXPECTED EXCEPTION CAUGHT 💥");
+      console.error(err);
+      alert(
+        "A critical error occurred. Open the browser Developer Tools (F12) to see the logs.",
+      );
       setLoading(false);
-      return;
-    }
-
-    if (data) {
-      alert("Admin account created successfully! Check your D1 database.");
-      router.push("/"); // Redirect home after success
     }
   };
 
@@ -65,8 +89,8 @@ export default function TempAdminSetup() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn btn-primary mt-2"
               disabled={loading}
             >
@@ -74,7 +98,8 @@ export default function TempAdminSetup() {
             </button>
           </form>
           <p className="text-xs text-center text-gray-500 mt-4">
-            Remember to delete this page after creating the account to secure the order form!
+            Remember to delete this page after creating the account to secure
+            the order form!
           </p>
         </div>
       </div>
