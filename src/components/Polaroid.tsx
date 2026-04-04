@@ -18,7 +18,8 @@ export default function Polaroid({
       <div className="relative aspect-square w-full overflow-hidden rounded-lg border-4 border-content">
         <Image 
           src={imageSrc} 
-          alt={title} 
+          alt={title}
+          unoptimized 
           fill 
           className="object-contain" 
         />

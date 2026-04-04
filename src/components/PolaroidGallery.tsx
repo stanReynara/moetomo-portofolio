@@ -6,7 +6,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { unstable_cache } from "next/cache";
 
 export default async function PolaroidGallery() {
-  // 1. Get the context/env first (must be outside the cache function)
+  // 1. Get the context/env first
   const { env } = await getCloudflareContext({ async: true });
 
   // 2. Wrap the D1 database call in the Next.js cache
@@ -19,24 +19,37 @@ export default async function PolaroidGallery() {
     { tags: ['artists-data'] }
   );
 
-  // 3. Execute the cached function. 
+  // 3. Execute the cached function
   const fetchedArtists = await getCachedArtists();
 
-  // Define your R2 Public URL (from the previous step)
-  const R2_URL = `api/images/${artists.avatar}`;
+  // 4. Define your Base Image URL
+  // If you are using an API route as a proxy: const BASE_IMAGE_URL = "/api/images";
+  // If using your public R2 custom domain:
+  const BASE_IMAGE_URL = "https://pub-92760cc6862345509bd9b0867e90c2c6.r2.dev/avatars"; // Replace with your actual CDN domain
 
   return (
     <>
-      {fetchedArtists.map((artist) => (
-        <Polaroid 
-          key={artist.id} 
-          title={artist.name} 
-          description={artist.description || ""} 
-          // 4. Dynamically append the R2 bucket URL to the stored filename
-          imageSrc={artist.polaroid ? `${R2_URL}/${artist.polaroid}` : "/default-placeholder.png"} 
-          socials={artist.socials || {}} 
-        />
-      ))}
+      {fetchedArtists.map((artist) => {
+        // Handle the leading slash issue. 
+        const cleanPath = artist.avatar?.startsWith('/') 
+          ? artist.avatar 
+          : `/${artist.avatar}`;
+
+        // Construct the final image source
+        const finalImageSrc = artist.avatar 
+          ? `${BASE_IMAGE_URL}${cleanPath}` 
+          : "/default-placeholder.png";
+
+        return (
+          <Polaroid 
+            key={artist.id} 
+            title={artist.name} 
+            description={artist.description || ""} 
+            imageSrc={finalImageSrc} 
+            socials={artist.socials || {}} 
+          />
+        );
+      })}
     </>
   );
 }
