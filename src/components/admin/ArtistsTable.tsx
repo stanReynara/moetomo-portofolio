@@ -8,7 +8,7 @@ type Artist = {
   avatar: string | null;
   polaroid: string | null;
   description: string | null;
-  socials: any;
+  socials: Record<string, string> | null;
   createdAt: Date | number;
 };
 
