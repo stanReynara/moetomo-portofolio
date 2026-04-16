@@ -1,7 +1,7 @@
+// src/components/admin/EditArtistModal.tsx
 "use client";
 
 import { useRef, useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 
 type Artist = {
   id: number;
@@ -19,78 +19,47 @@ interface EditArtistModalProps {
 export default function EditArtistModal({ artist }: EditArtistModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter(); // Initialize router for refreshing the page
 
+  // Parse existing socials safely
   const existingSocials = artist.socials || {};
 
   const openModal = () => dialogRef.current?.showModal();
   const closeModal = () => dialogRef.current?.close();
 
+  // Handle form submission
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
     
-    // 1. Group the social links into a single object
-    const instagram = formData.get("instagram") as string;
-    const twitter = formData.get("twitter") as string;
+    // We will hook this up to a Server Action next!
+    console.log("Submitting updated artist data:", Object.fromEntries(formData));
     
-    const socialsPayload: Record<string, string> = {};
-    if (instagram) socialsPayload.instagram = instagram;
-    if (twitter) socialsPayload.twitter = twitter;
-
-    // 2. Build the payload matching your API's expected UpdateArtist type
-    const updateData = {
-      id: artist.id, // ID is required for the PATCH request
-      name: formData.get("name") as string,
-      avatar: (formData.get("avatar") as string) || null,
-      polaroid: (formData.get("polaroid") as string) || null,
-      description: (formData.get("description") as string) || null,
-      socials: Object.keys(socialsPayload).length > 0 ? socialsPayload : null,
-    };
-
-    try {
-      // 3. Send the PATCH request to your API route
-      const response = await fetch("/api/artists", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updateData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update artist");
-      }
-
-      // 4. Success! Close modal and refresh the parent page
-      closeModal();
-      router.refresh(); // This tells Next.js to re-run the server component and fetch fresh D1 data
-      
-    } catch (error) {
-      console.error("Failed to update:", error);
-      alert("An error occurred while saving. Please try again.");
-    } finally {
+    // Simulate API call
+    setTimeout(() => {
       setIsSubmitting(false);
-    }
+      closeModal();
+    }, 1000);
   };
 
   return (
     <>
+      {/* The Edit Button that triggers the modal */}
       <button onClick={openModal} className="btn btn-sm btn-outline">
         Edit
       </button>
 
+      {/* The DaisyUI Modal */}
       <dialog ref={dialogRef} className="modal">
         <div className="modal-box max-w-2xl">
           <h3 className="font-bold text-2xl mb-6">Edit Artist: {artist.name}</h3>
 
           <form onSubmit={handleSubmit} className="space-y-4 text-left">
-            {/* Hidden ID field is technically no longer needed in the HTML since we grab it from props, but keeping it is harmless */}
+            {/* Hidden ID field for the server action */}
             <input type="hidden" name="id" value={artist.id} />
 
+            {/* Name */}
             <div className="form-control w-full">
               <label className="label"><span className="label-text font-medium">Name</span></label>
               <input 
@@ -103,6 +72,7 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Avatar Path */}
               <div className="form-control w-full">
                 <label className="label"><span className="label-text font-medium">Avatar Path</span></label>
                 <input 
@@ -114,6 +84,7 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
                 />
               </div>
 
+              {/* Polaroid Path */}
               <div className="form-control w-full">
                 <label className="label"><span className="label-text font-medium">Polaroid Path</span></label>
                 <input 
@@ -126,20 +97,18 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
               </div>
             </div>
 
-            {/* Description using the flex-col fix */}
-            <div className="flex flex-col w-full gap-2 mt-2">
-              <label htmlFor="description" className="text-sm font-medium px-1">
-                Description (Bio)
-              </label>
+            {/* Description */}
+            <div className="form-control w-full">
+              <label className="label"><span className="label-text font-medium">Description (Bio)</span></label>
               <textarea 
-                id="description"
                 name="description" 
                 defaultValue={artist.description || ""} 
-                className="textarea textarea-bordered h-24 w-full" 
+                className="textarea textarea-bordered h-24" 
                 placeholder="Artist biography..."
               ></textarea>
             </div>
 
+            {/* Socials (JSON structured visually) */}
             <div className="bg-base-200 p-4 rounded-lg space-y-3 mt-4">
               <h4 className="font-semibold text-sm">Social Links</h4>
               
@@ -166,6 +135,7 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
               </div>
             </div>
 
+            {/* Modal Actions */}
             <div className="modal-action mt-8">
               <button type="button" className="btn btn-ghost" onClick={closeModal} disabled={isSubmitting}>
                 Cancel
@@ -177,6 +147,7 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
           </form>
         </div>
         
+        {/* Clicking outside closes the modal */}
         <form method="dialog" className="modal-backdrop">
           <button onClick={closeModal}>close</button>
         </form>

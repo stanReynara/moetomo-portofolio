@@ -1,30 +1,21 @@
+// src/components/admin/AddArtistModal.tsx
 "use client";
 
 import { useRef, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
-type Artist = {
-  id: number;
-  name: string;
-  avatar: string | null;
-  polaroid: string | null;
-  description: string | null;
-  socials: Record<string, string> | null;
-};
-
-interface EditArtistModalProps {
-  artist: Artist;
-}
-
-export default function EditArtistModal({ artist }: EditArtistModalProps) {
+export default function AddArtistModal() {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter(); // Initialize router for refreshing the page
-
-  const existingSocials = artist.socials || {};
+  const router = useRouter();
 
   const openModal = () => dialogRef.current?.showModal();
-  const closeModal = () => dialogRef.current?.close();
+  
+  const closeModal = () => {
+    dialogRef.current?.close();
+    formRef.current?.reset(); // Clear the form when closing
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,7 +23,7 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
 
     const formData = new FormData(e.currentTarget);
     
-    // 1. Group the social links into a single object
+    // Group the social links
     const instagram = formData.get("instagram") as string;
     const twitter = formData.get("twitter") as string;
     
@@ -40,9 +31,8 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
     if (instagram) socialsPayload.instagram = instagram;
     if (twitter) socialsPayload.twitter = twitter;
 
-    // 2. Build the payload matching your API's expected UpdateArtist type
-    const updateData = {
-      id: artist.id, // ID is required for the PATCH request
+    // Build the insert payload (no ID needed for POST)
+    const newArtistData = {
       name: formData.get("name") as string,
       avatar: (formData.get("avatar") as string) || null,
       polaroid: (formData.get("polaroid") as string) || null,
@@ -51,27 +41,27 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
     };
 
     try {
-      // 3. Send the PATCH request to your API route
+      // Send the POST request to your existing API route
       const response = await fetch("/api/artists", {
-        method: "PATCH",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updateData),
+        body: JSON.stringify(newArtistData),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update artist");
+        throw new Error(errorData.error || "Failed to add artist");
       }
 
-      // 4. Success! Close modal and refresh the parent page
+      // Success! Close, clear, and refresh
       closeModal();
-      router.refresh(); // This tells Next.js to re-run the server component and fetch fresh D1 data
+      router.refresh();
       
     } catch (error) {
-      console.error("Failed to update:", error);
-      alert("An error occurred while saving. Please try again.");
+      console.error("Failed to add:", error);
+      alert("An error occurred while adding the artist. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -79,25 +69,24 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
 
   return (
     <>
-      <button onClick={openModal} className="btn btn-sm btn-outline">
-        Edit
+      {/* The Add Button that triggers the modal */}
+      <button onClick={openModal} className="btn btn-primary">
+        + Add New Artist
       </button>
 
       <dialog ref={dialogRef} className="modal">
         <div className="modal-box max-w-2xl">
-          <h3 className="font-bold text-2xl mb-6">Edit Artist: {artist.name}</h3>
+          <h3 className="font-bold text-2xl mb-6">Add New Artist</h3>
 
-          <form onSubmit={handleSubmit} className="space-y-4 text-left">
-            {/* Hidden ID field is technically no longer needed in the HTML since we grab it from props, but keeping it is harmless */}
-            <input type="hidden" name="id" value={artist.id} />
-
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-4 text-left">
+            
             <div className="form-control w-full">
               <label className="label"><span className="label-text font-medium">Name</span></label>
               <input 
                 type="text" 
                 name="name" 
-                defaultValue={artist.name} 
                 className="input input-bordered w-full" 
+                placeholder="Artist Name"
                 required 
               />
             </div>
@@ -108,8 +97,7 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
                 <input 
                   type="text" 
                   name="avatar" 
-                  defaultValue={artist.avatar || ""} 
-                  placeholder="/avatar/name.png"
+                  placeholder="/avatars/name.png"
                   className="input input-bordered w-full" 
                 />
               </div>
@@ -119,22 +107,19 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
                 <input 
                   type="text" 
                   name="polaroid" 
-                  defaultValue={artist.polaroid || ""} 
                   placeholder="/polaroids/name.png"
                   className="input input-bordered w-full" 
                 />
               </div>
             </div>
 
-            {/* Description using the flex-col fix */}
             <div className="flex flex-col w-full gap-2 mt-2">
-              <label htmlFor="description" className="text-sm font-medium px-1">
+              <label htmlFor="new-description" className="text-sm font-medium px-1">
                 Description (Bio)
               </label>
               <textarea 
-                id="description"
+                id="new-description"
                 name="description" 
-                defaultValue={artist.description || ""} 
                 className="textarea textarea-bordered h-24 w-full" 
                 placeholder="Artist biography..."
               ></textarea>
@@ -148,7 +133,6 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
                 <input 
                   type="url" 
                   name="instagram" 
-                  defaultValue={existingSocials.instagram || ""} 
                   placeholder="https://instagram.com/..."
                   className="input input-sm input-bordered w-full" 
                 />
@@ -159,7 +143,6 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
                 <input 
                   type="url" 
                   name="twitter" 
-                  defaultValue={existingSocials.twitter || ""} 
                   placeholder="https://twitter.com/..."
                   className="input input-sm input-bordered w-full" 
                 />
@@ -171,7 +154,7 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
                 Cancel
               </button>
               <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                {isSubmitting ? <span className="loading loading-spinner"></span> : "Save Changes"}
+                {isSubmitting ? <span className="loading loading-spinner"></span> : "Add Artist"}
               </button>
             </div>
           </form>
