@@ -29,27 +29,21 @@ export default function EditItemModal({ item }: EditItemModalProps) {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const formData = new FormData(e.currentTarget);
-    
-    // Build the payload matching the Items schema
-    const updateData = {
-      id: item.id,
-      name: formData.get("name") as string,
-      price: parseInt(formData.get("price") as string, 10), // Convert to integer
-      type: formData.get("type") as string,
-      imageUrl: (formData.get("imageUrl") as string) || null,
-      description: (formData.get("description") as string) || null,
-    };
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    // Prevent sending an empty file if the user didn't upload a new image
+    const imageFile = formData.get("image") as File;
+    if (!imageFile || imageFile.size === 0) {
+      formData.delete("image");
+    }
 
     try {
-      // Send the PATCH request to your items API route
-      // (Make sure you create src/app/api/items/route.ts similar to your artists one!)
+      // Send the PATCH request to /api/items
       const response = await fetch("/api/items", {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updateData),
+        // Browser automatically sets Content-Type to multipart/form-data with boundary
+        body: formData, 
       });
 
       if (!response.ok) {
@@ -79,6 +73,7 @@ export default function EditItemModal({ item }: EditItemModalProps) {
           <h3 className="font-bold text-2xl mb-6">Edit Item: {item.name}</h3>
 
           <form onSubmit={handleSubmit} className="space-y-4 text-left">
+            {/* Hidden ID field for the PATCH request */}
             <input type="hidden" name="id" value={item.id} />
 
             {/* Name */}
@@ -107,7 +102,7 @@ export default function EditItemModal({ item }: EditItemModalProps) {
                 />
               </div>
 
-              {/* Type (Dropdown) */}
+              {/* Type */}
               <div className="form-control w-full">
                 <label className="label"><span className="label-text font-medium">Item Type</span></label>
                 <select 
@@ -116,32 +111,39 @@ export default function EditItemModal({ item }: EditItemModalProps) {
                   className="select select-bordered w-full"
                   required
                 >
-                  <option value="Item">Physical Item</option>
-                  <option value="Service">Service / Commission</option>
-                  <option value="Digital">Digital Download</option>
+                  <option value="Item">Item (Physical/Digital)</option>
+                  <option value="Service">Service (Commission)</option>
                 </select>
               </div>
             </div>
 
-            {/* Image URL */}
+            {/* Image Upload */}
             <div className="form-control w-full">
-              <label className="label"><span className="label-text font-medium">Image Path</span></label>
+              <label className="label">
+                <span className="label-text font-medium">Update Image (Optional)</span>
+              </label>
               <input 
-                type="text" 
-                name="imageUrl" 
-                defaultValue={item.imageUrl || ""} 
-                placeholder="/items/merch-1.png"
-                className="input input-bordered w-full" 
+                type="file" 
+                name="image" 
+                accept="image/*"
+                className="file-input file-input-bordered w-full" 
               />
+              {item.imageUrl && (
+                <label className="label">
+                  <span className="label-text-alt text-gray-500 truncate">
+                    Current: {item.imageUrl}
+                  </span>
+                </label>
+              )}
             </div>
 
-            {/* Description (Using the flex-col fix so the label sits on top) */}
+            {/* Description */}
             <div className="flex flex-col w-full gap-2 mt-2">
-              <label htmlFor="item-description" className="text-sm font-medium px-1">
+              <label htmlFor={`edit-desc-${item.id}`} className="text-sm font-medium px-1">
                 Description
               </label>
               <textarea 
-                id="item-description"
+                id={`edit-desc-${item.id}`}
                 name="description" 
                 defaultValue={item.description || ""} 
                 className="textarea textarea-bordered h-24 w-full" 
