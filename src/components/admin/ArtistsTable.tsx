@@ -17,7 +17,10 @@ interface ArtistsTableProps {
 }
 
 export default function ArtistTable({ artists }: ArtistsTableProps) {
-  const BASE_IMAGE_URL = "https://pub-92760cc6862345509bd9b0867e90c2c6.r2.dev";
+  // SINGLE SOURCE OF TRUTH: Get the Bucket URL from Environment Variables
+  // Local: http://localhost:3000/api/bucket
+  // Prod:  https://pub-92760cc6862345509bd9b0867e90c2c6.r2.dev
+  const BUCKET_URL = process.env.NEXT_PUBLIC_BUCKET_URL || "";
 
   return (
     <div className="overflow-x-auto">
@@ -51,8 +54,9 @@ export default function ArtistTable({ artists }: ArtistsTableProps) {
                 ? artist.avatar
                 : `/${artist.avatar}`;
 
+              // Use BUCKET_URL here
               const finalImageSrc = artist.avatar
-                ? `${BASE_IMAGE_URL}${cleanPath}`
+                ? `${BUCKET_URL}${cleanPath}`
                 : "/default-placeholder.png";
 
               // Safely handle the JSON socials object

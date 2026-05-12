@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import type { Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Logo from "@components/Logo";
-import Navbar from "@components/Navbar";
 import "./globals.css";
-
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,8 +13,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Single source of truth from environment variables
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+const BUCKET_URL = process.env.NEXT_PUBLIC_BUCKET_URL || '';
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://moetomo-portofolio.stanleyreynara.workers.dev'),
+  metadataBase: new URL(BASE_URL),
   title: "Moetomo",
   description: "Moetomo's Portfolio",
   openGraph: {
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
     description: "Moetomo's Portfolio",
     images: [
       {
-        url: 'https://pub-92760cc6862345509bd9b0867e90c2c6.r2.dev/opengraph-image.png',
+        url: `${BUCKET_URL}/opengraph-image.png`,
         width: 1200,
         height: 630,
       },
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     description: "Moetomo's Portfolio",
     images: [
       {
-        url: 'https://pub-92760cc6862345509bd9b0867e90c2c6.r2.dev/opengraph-image.png',
+        url: `${BUCKET_URL}/opengraph-image.png`,
         width: 1200,
         height: 630,
       },
@@ -57,7 +58,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="pastel">
       <head>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml"></link>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-base-100`}

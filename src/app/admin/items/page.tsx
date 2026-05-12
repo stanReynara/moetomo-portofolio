@@ -4,7 +4,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { drizzle } from "drizzle-orm/d1";
 import { isNull, desc } from "drizzle-orm";
 import * as schema from "@db/schema";
-import EditItemsModal from "@/components/admin/EditItemsModal"; // Make sure to create this component
+import EditItemsModal from "@/components/admin/EditItemsModal";
 
 export const dynamic = "force-dynamic";
 
@@ -20,8 +20,10 @@ export default async function AdminItemsPage() {
     .where(isNull(schema.items.deletedAt))
     .orderBy(desc(schema.items.createdAt));
 
-  // 3. Set up the R2 CDN base URL
-  const BASE_IMAGE_URL = "https://pub-92760cc6862345509bd9b0867e90c2c6.r2.dev";
+  // 3. SINGLE SOURCE OF TRUTH: Get the Bucket URL from Environment Variables
+  // Local: http://localhost:3000/api/bucket
+  // Prod:  https://pub-92760cc6862345509bd9b0867e90c2c6.r2.dev
+  const BUCKET_URL = process.env.NEXT_PUBLIC_BUCKET_URL || "";
 
   // Helper function to format IDR
   const formatIDR = (amount: number) => {
@@ -52,7 +54,6 @@ export default async function AdminItemsPage() {
         <div className="card-body p-0">
           <div className="overflow-x-auto">
             <table className="table table-zebra w-full">
-              {/* Table Head */}
               <thead className="bg-base-200/50 text-base-content">
                 <tr>
                   <th>Item Details</th>
@@ -63,52 +64,47 @@ export default async function AdminItemsPage() {
                 </tr>
               </thead>
 
-              {/* Table Body */}
               <tbody>
                 {fetchedItems.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={5}
-                      className="text-center py-8 text-base-content/50"
-                    >
+                    <td colSpan={5} className="text-center py-8 text-base-content/50">
                       No items found. Click the button above to add one!
                     </td>
                   </tr>
                 ) : (
                   fetchedItems.map((item) => {
-                    // Construct the R2 image path perfectly
+                    // Construct the image path using the single source of truth
+                    // Ensure we don't have double slashes if item.imageUrl starts with one
                     const cleanPath = item.imageUrl?.startsWith("/")
                       ? item.imageUrl
                       : `/${item.imageUrl}`;
 
                     const finalImageSrc = item.imageUrl
-                      ? `${BASE_IMAGE_URL}${cleanPath}`
+                      ? `${BUCKET_URL}${cleanPath}`
                       : "/default-placeholder.png";
 
                     return (
                       <tr key={item.id} className="hover">
-                        {/* 1. Thumbnail, Name, and Type Badge */}
                         <td>
                           <div className="flex items-center gap-4">
                             <div className="avatar">
-                              {/* Using a rounded square mask for items instead of a circle */}
                               <div className="w-14 h-14 mask mask-squircle bg-base-200 relative">
                                 <Image
                                   src={finalImageSrc}
                                   alt={item.name}
                                   fill
-                                  unoptimized
+                                  unoptimized // Important for R2/Local Proxy to skip Next.js optimization issues
                                   className="object-cover"
                                 />
                               </div>
                             </div>
                             <div>
-                              <div className="font-bold text-lg">
-                                {item.name}
-                              </div>
+                              <div className="font-bold text-lg">{item.name}</div>
                               <div className="mt-1">
                                 <span className={`badge badge-sm ${
-                                  item.type.toLowerCase() === 'service' ? 'badge-secondary' : 'badge-primary badge-outline'
+                                  item.type.toLowerCase() === 'service' 
+                                    ? 'badge-secondary' 
+                                    : 'badge-primary badge-outline'
                                 }`}>
                                   {item.type}
                                 </span>
@@ -117,42 +113,29 @@ export default async function AdminItemsPage() {
                           </div>
                         </td>
 
-                        {/* 2. Truncated Description */}
                         <td className="max-w-xs">
                           {item.description ? (
-                            <div
-                              className="truncate opacity-80"
-                              title={item.description}
-                            >
+                            <div className="truncate opacity-80" title={item.description}>
                               {item.description}
                             </div>
                           ) : (
-                            <span className="opacity-40 italic">
-                              No description
-                            </span>
+                            <span className="opacity-40 italic">No description</span>
                           )}
                         </td>
 
-                        {/* 3. Price */}
                         <td className="font-mono font-medium">
                           {formatIDR(item.price)}
                         </td>
 
-                        {/* 4. Added Date */}
                         <td className="whitespace-nowrap opacity-80">
-                          {new Date(item.createdAt).toLocaleDateString(
-                            undefined,
-                            {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            },
-                          )}
+                          {new Date(item.createdAt).toLocaleDateString(undefined, {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
                         </td>
 
-                        {/* 5. Actions */}
                         <td className="text-right space-x-2">
-                          {/* Pass the entire item object to the modal */}
                           <EditItemsModal item={item} />
                         </td>
                       </tr>

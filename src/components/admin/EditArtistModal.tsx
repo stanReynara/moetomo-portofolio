@@ -19,7 +19,7 @@ interface EditArtistModalProps {
 export default function EditArtistModal({ artist }: EditArtistModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter(); // Initialize router for refreshing the page
+  const router = useRouter();
 
   const existingSocials = artist.socials || {};
 
@@ -30,34 +30,40 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     
-    // 1. Group the social links into a single object
+    // 1. Group the social links into a single JSON string
     const instagram = formData.get("instagram") as string;
     const twitter = formData.get("twitter") as string;
     
     const socialsPayload: Record<string, string> = {};
     if (instagram) socialsPayload.instagram = instagram;
     if (twitter) socialsPayload.twitter = twitter;
+    
+    // Append socials as a string and remove the individual fields
+    formData.set("socials", Object.keys(socialsPayload).length > 0 ? JSON.stringify(socialsPayload) : "");
+    formData.delete("instagram");
+    formData.delete("twitter");
 
-    // 2. Build the payload matching your API's expected UpdateArtist type
-    const updateData = {
-      id: artist.id, // ID is required for the PATCH request
-      name: formData.get("name") as string,
-      avatar: (formData.get("avatar") as string) || null,
-      polaroid: (formData.get("polaroid") as string) || null,
-      description: (formData.get("description") as string) || null,
-      socials: Object.keys(socialsPayload).length > 0 ? socialsPayload : null,
-    };
+    // 2. Prevent sending empty files if the user didn't select new images
+    const avatarFile = formData.get("avatar") as File;
+    if (!avatarFile || avatarFile.size === 0) {
+      formData.delete("avatar");
+    }
+
+    const polaroidFile = formData.get("polaroid") as File;
+    if (!polaroidFile || polaroidFile.size === 0) {
+      formData.delete("polaroid");
+    }
 
     try {
-      // 3. Send the PATCH request to your API route
+      // 3. Send the PATCH request as multipart/form-data
       const response = await fetch("/api/artists", {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updateData),
+        // Note: Do NOT set "Content-Type" manually when sending FormData.
+        // The browser automatically sets it to multipart/form-data with the correct boundary.
+        body: formData,
       });
 
       if (!response.ok) {
@@ -67,7 +73,7 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
 
       // 4. Success! Close modal and refresh the parent page
       closeModal();
-      router.refresh(); // This tells Next.js to re-run the server component and fetch fresh D1 data
+      router.refresh();
       
     } catch (error) {
       console.error("Failed to update:", error);
@@ -88,7 +94,6 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
           <h3 className="font-bold text-2xl mb-6">Edit Artist: {artist.name}</h3>
 
           <form onSubmit={handleSubmit} className="space-y-4 text-left">
-            {/* Hidden ID field is technically no longer needed in the HTML since we grab it from props, but keeping it is harmless */}
             <input type="hidden" name="id" value={artist.id} />
 
             <div className="form-control w-full">
@@ -104,29 +109,36 @@ export default function EditArtistModal({ artist }: EditArtistModalProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-control w-full">
-                <label className="label"><span className="label-text font-medium">Avatar Path</span></label>
+                <label className="label"><span className="label-text font-medium">Avatar Image</span></label>
                 <input 
-                  type="text" 
+                  type="file" 
                   name="avatar" 
-                  defaultValue={artist.avatar || ""} 
-                  placeholder="/avatar/name.png"
-                  className="input input-bordered w-full" 
+                  accept="image/*"
+                  className="file-input file-input-bordered w-full" 
                 />
+                {artist.avatar && (
+                  <label className="label">
+                    <span className="label-text-alt text-gray-500 truncate">Current: {artist.avatar}</span>
+                  </label>
+                )}
               </div>
 
               <div className="form-control w-full">
-                <label className="label"><span className="label-text font-medium">Polaroid Path</span></label>
+                <label className="label"><span className="label-text font-medium">Polaroid Image</span></label>
                 <input 
-                  type="text" 
+                  type="file" 
                   name="polaroid" 
-                  defaultValue={artist.polaroid || ""} 
-                  placeholder="/polaroids/name.png"
-                  className="input input-bordered w-full" 
+                  accept="image/*"
+                  className="file-input file-input-bordered w-full" 
                 />
+                {artist.polaroid && (
+                  <label className="label">
+                    <span className="label-text-alt text-gray-500 truncate">Current: {artist.polaroid}</span>
+                  </label>
+                )}
               </div>
             </div>
 
-            {/* Description using the flex-col fix */}
             <div className="flex flex-col w-full gap-2 mt-2">
               <label htmlFor="description" className="text-sm font-medium px-1">
                 Description (Bio)
