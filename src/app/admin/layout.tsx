@@ -58,6 +58,11 @@ export default function AdminLayout({
               </Link>
             </li>
             <li>
+              <Link href="/admin/displays" className="hover:bg-base-200 font-medium">
+                <Palette className="w-4 h-4 mr-1"/> Displays
+              </Link>
+            </li>
+            <li>
               <Link href="/admin/items" className="hover:bg-base-200 font-medium">
                 <Package className="w-4 h-4 mr-1"/> Items
               </Link>

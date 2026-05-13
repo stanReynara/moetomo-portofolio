@@ -1,11 +1,11 @@
-import Menu from "@components/Menu";
+import Menu from "@/components/Item";
 import { getDb } from "@/db/index";
 import { isNull } from "drizzle-orm";
 import { items } from "@/db/schema";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { unstable_cache } from "next/cache";
 
-export default async function MenuGallery() {
+export default async function ItemGallery() {
   // 1. Get the context/env
   const { env } = await getCloudflareContext({ async: true });
 
