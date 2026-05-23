@@ -1,5 +1,7 @@
 import ItemGallery from "@/components/ItemGallery";
 
+export const dynamic = "force-dynamic";
+
 export default function Shop() {
   return (
     <main className="min-h-screen bg-base-100 text-base-content pb-16">
