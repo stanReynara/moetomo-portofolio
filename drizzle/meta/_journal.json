@@ -64,6 +64,13 @@
       "when": 1775291313750,
       "tag": "0008_oval_betty_ross",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1779535708366,
+      "tag": "0009_secret_bloodaxe",
+      "breakpoints": true
     }
   ]
 }
