@@ -20,6 +20,11 @@ export default async function AdminItemsPage() {
     .where(isNull(schema.items.deletedAt))
     .orderBy(desc(schema.items.createdAt));
 
+  const fetchedArtists = await db
+    .select({ id: schema.artists.id, name: schema.artists.name })
+    .from(schema.artists)
+    .where(isNull(schema.artists.deletedAt));
+
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       {/* Header Section */}
@@ -30,7 +35,7 @@ export default async function AdminItemsPage() {
             Manage the merchandise and services available in your store.
           </p>
         </div>
-        <AddItemModal />
+        <AddItemModal artists={fetchedArtists} />
       </div>
 
       {/* Main Table Card */}

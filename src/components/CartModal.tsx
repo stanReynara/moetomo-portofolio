@@ -4,10 +4,21 @@ import { useCart } from "./CartProvider";
 import { useState } from "react";
 
 export default function CartModal() {
-  const { cart, cartTotal, cartCount, updateQuantity, removeFromCart } =
-    useCart();
+  const {
+    cart,
+    cartTotal,
+    cartCount,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+  } = useCart();
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
+  const [customerNotes, setCustomerNotes] = useState(""); // NEW: Notes state
+
+  // New states for form submission handling
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const formatIDR = (amount: number) => {
     return new Intl.NumberFormat("id-ID", {
@@ -17,45 +28,55 @@ export default function CartModal() {
     }).format(amount);
   };
 
-  const clearCart = () => {
-    useCart().clearCart();
-  };
-
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
 
-    // 1. Map the cart to ONLY include id and quantity
+    // 1. Map the cart to match the CartItem type the API expects ({ itemId, quantity })
     const orderItems = cart.map((item) => ({
-      id: item.id,
+      itemId: item.id,
       quantity: item.quantity,
     }));
 
     // 2. Construct the clean payload
     const orderPayload = {
       customerName,
-      customerEmail, // Assuming you added an email input state
+      customerEmail,
+      notes: customerNotes, // NEW: Include notes in payload
       items: orderItems,
     };
 
     // 3. Send it to your API
     try {
-      console.log("Order Payload:", orderPayload); // For debugging
-      // const response = await fetch("/api/checkout", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(orderPayload),
-      // });
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderPayload),
+      });
 
-      // if (response.ok) {
-      //   // Handle success (clear cart, show success message, etc.)
-        // clearCart();
-      // }
-    } catch (error) {
-      console.error("Checkout failed", error);
+      // Cast the response to an object containing an optional 'error' string
+      const data = (await response.json()) as { error?: string };
+
+      if (response.ok) {
+        // Success: Clear cart, reset form, and close modal
+        clearCart();
+        setCustomerName("");
+        setCustomerEmail("");
+        setCustomerNotes(""); // NEW: Reset notes
+        (document.getElementById("cart_modal") as HTMLDialogElement)?.close();
+
+        // Optional: Replace this with a nice toast notification
+        alert("Order submitted successfully! Check your email for details.");
+      } else {
+        // Handle API errors (e.g., missing fields, items not found)
+        setError(data.error || "Failed to submit order. Please try again.");
+      }
+    } catch (err) {
+      console.error("Checkout failed", err);
+      setError("A network error occurred. Please try again.");
     } finally {
-      (
-        document.getElementById("cart_modal") as HTMLDialogElement
-      )?.close();
+      setIsSubmitting(false);
     }
   };
 
@@ -131,6 +152,7 @@ export default function CartModal() {
                           updateQuantity(item.id, item.quantity - 1)
                         }
                         className="btn btn-xs btn-circle btn-ghost"
+                        type="button"
                       >
                         -
                       </button>
@@ -142,6 +164,7 @@ export default function CartModal() {
                           updateQuantity(item.id, item.quantity + 1)
                         }
                         className="btn btn-xs btn-circle btn-ghost"
+                        type="button"
                       >
                         +
                       </button>
@@ -150,6 +173,7 @@ export default function CartModal() {
                     <button
                       onClick={() => removeFromCart(item.id)}
                       className="btn btn-xs btn-error btn-square rounded-md"
+                      type="button"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -184,6 +208,26 @@ export default function CartModal() {
                 </span>
               </div>
 
+              {/* Error Message Display */}
+              {error && (
+                <div className="alert alert-error text-sm p-3 rounded-lg">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="stroke-current shrink-0 h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span>{error}</span>
+                </div>
+              )}
+
               <div className="form-control w-full">
                 <label className="label">
                   <span className="label-text font-bold">Your Name</span>
@@ -195,19 +239,36 @@ export default function CartModal() {
                   required
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
+                  disabled={isSubmitting}
                 />
               </div>
+              
               <div className="form-control w-full">
                 <label className="label">
                   <span className="label-text font-bold">Your Email</span>
                 </label>
                 <input
-                  type="text"
+                  type="email"
                   placeholder="example@example.com"
                   className="input input-bordered w-full bg-base-100"
                   required
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              {/* NEW: Optional Notes Field */}
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text font-bold">Notes <span className="opacity-50 font-normal">(Optional)</span></span>
+                </label>
+                <textarea
+                  placeholder="Any special requests, links to reference images, or instructions?"
+                  className="textarea textarea-bordered w-full bg-base-100 min-h-[80px]"
+                  value={customerNotes}
+                  onChange={(e) => setCustomerNotes(e.target.value)}
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -218,8 +279,16 @@ export default function CartModal() {
               <button
                 type="submit"
                 className="btn btn-primary w-full text-lg shadow-lg"
+                disabled={isSubmitting}
               >
-                Request Payment Info
+                {isSubmitting ? (
+                  <>
+                    <span className="loading loading-spinner"></span>
+                    Processing...
+                  </>
+                ) : (
+                  "Request Payment Info"
+                )}
               </button>
             </form>
           )}
@@ -227,7 +296,7 @@ export default function CartModal() {
 
         {/* Click outside to close */}
         <form method="dialog" className="modal-backdrop">
-          <button>close</button>
+          <button disabled={isSubmitting}>close</button>
         </form>
       </dialog>
     </>

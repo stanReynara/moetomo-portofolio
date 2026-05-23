@@ -41,11 +41,12 @@ export async function POST(request: Request) {
     const db = drizzle(env.DB, { schema });
     const formData = await request.formData();
 
-    // 1. Extract standard fields
+    // 1. Extract standard fields and array of artist IDs
     const name = formData.get("name") as string;
     const priceString = formData.get("price") as string;
     const type = formData.get("type") as string;
     const description = formData.get("description") as string | null;
+    const artistIds = formData.getAll("artistIds") as string[];
 
     if (!name || !priceString || !type) {
       return Response.json({ error: "Missing required fields (name, price, type)" }, { status: 400 });
@@ -60,7 +61,18 @@ export async function POST(request: Request) {
       .values({ name, price, type, description })
       .returning();
 
-    // 3. Handle File Upload using the newly generated ID
+    // 3. Insert relationships into the junction table
+    if (artistIds.length > 0) {
+      console.log(`[DB] Linking item to ${artistIds.length} artist(s)...`);
+      const itemArtistsData = artistIds.map((idStr) => ({
+        itemId: newItem.id,
+        artistId: parseInt(idStr, 10),
+      }));
+
+      await db.insert(schema.itemArtists).values(itemArtistsData).execute();
+    }
+
+    // 4. Handle File Upload using the newly generated ID
     const r2Bucket = env.BUCKET as R2Bucket | undefined;
     const imageFile = formData.get("image") as File | null;
 
@@ -78,7 +90,7 @@ export async function POST(request: Request) {
       const imageUrl = `/${path}`;
       console.log(`[R2 UPLOAD] ✅ Uploaded successfully to: ${imageUrl}`);
 
-      // 4. Update the newly created item with the image URL
+      // 5. Update the newly created item with the image URL
       await db
         .update(schema.items)
         .set({ imageUrl })

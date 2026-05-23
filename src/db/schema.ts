@@ -153,3 +153,18 @@ export const itemArtistsRelations = relations(itemArtists, ({ one }) => ({
     references: [artists.id],
   }),
 }));
+
+export const ordersRelations = relations(orders, ({ many }) => ({
+  orderItems: many(orderItems),
+}));
+
+export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+  order: one(orders, {
+    fields: [orderItems.orderId],
+    references: [orders.id],
+  }),
+  item: one(items, {
+    fields: [orderItems.itemId],
+    references: [items.id],
+  }),
+}));
