@@ -4,7 +4,14 @@
 import { useRef, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
-export default function AddItemModal() {
+// Define the shape of the artist data we need
+type Artist = {
+  id: number;
+  name: string;
+};
+
+// ADDED FALLBACK: artists = [] prevents the .length crash if data is missing
+export default function AddItemModal({ artists = [] }: { artists: Artist[] }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,11 +38,9 @@ export default function AddItemModal() {
     }
 
     try {
-      // Send the POST request to your items API route
-      // Note: We send the raw FormData to handle the file upload
       const response = await fetch("/api/items", {
         method: "POST",
-        body: formData, // Automatically sets Content-Type to multipart/form-data
+        body: formData, 
       });
 
       if (!response.ok) {
@@ -101,6 +106,30 @@ export default function AddItemModal() {
               </div>
             </div>
 
+            {/* Artist Selection - Matched to DaisyUI bordered style */}
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text font-medium">Artists (Select one or more)</span>
+              </label>
+              <div className="border border-base-content/20 rounded-lg max-h-36 overflow-y-auto bg-base-100 p-1">
+                {artists.length === 0 ? (
+                  <p className="text-sm text-base-content/50 p-3 text-center italic">No artists available. Add artists first.</p>
+                ) : (
+                  artists.map((artist) => (
+                    <label key={artist.id} className="label cursor-pointer justify-start gap-3 px-3 py-2 hover:bg-base-200/50 rounded-md transition-colors">
+                      <input 
+                        type="checkbox" 
+                        name="artistIds" 
+                        value={artist.id} 
+                        className="checkbox checkbox-sm checkbox-primary rounded" 
+                      />
+                      <span className="label-text">{artist.name}</span>
+                    </label>
+                  ))
+                )}
+              </div>
+            </div>
+
             <div className="form-control w-full">
               <label className="label"><span className="label-text font-medium">Image Upload</span></label>
               <input 
@@ -111,12 +140,12 @@ export default function AddItemModal() {
               />
             </div>
 
-            <div className="flex flex-col w-full gap-2 mt-2">
-              <label htmlFor="new-description" className="text-sm font-medium px-1">
-                Description
+            {/* Description - Standardized to DaisyUI form-control */}
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text font-medium">Description</span>
               </label>
               <textarea 
-                id="new-description"
                 name="description" 
                 className="textarea textarea-bordered h-24 w-full" 
                 placeholder="Describe the item or service..."
