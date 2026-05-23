@@ -1,0 +1,1 @@
+ALTER TABLE `items` ADD `created_by_id` text REFERENCES user(id);

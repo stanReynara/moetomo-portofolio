@@ -52,8 +52,11 @@ export const items = sqliteTable("items", {
   name: text("name").notNull(),
   description: text("description"),
   price: integer("price").notNull(),
-  type: text("type").notNull(), // e.g., Item or Service
+  type: text("type").notNull(),
   imageUrl: text("image_url"),
+  
+  createdById: text("created_by_id").references(() => user.id), 
+  
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(unixepoch())`),
@@ -124,9 +127,16 @@ export const orderItems = sqliteTable("order_items", {
 });
 
 // Relations
-
-export const itemsRelations = relations(items, ({ many }) => ({
+export const itemsRelations = relations(items, ({ one, many }) => ({
   itemArtists: many(itemArtists),
+  createdBy: one(user, {
+    fields: [items.createdById],
+    references: [user.id],
+  }),
+}));
+
+export const userRelations = relations(user, ({ many }) => ({
+  createdItems: many(items),
 }));
 
 export const artistsRelations = relations(artists, ({ many }) => ({
