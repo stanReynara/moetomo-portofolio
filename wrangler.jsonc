@@ -53,6 +53,7 @@
 	],
 	"env": {
     "development": {
+      "vars": { "ADMIN_EMAILS": "noellavonte@gmail.com,mogimoyu@gmail.com,hoshiumitoshi@gmail.com" },
       "services": [
         {
           "binding": "WORKER_SELF_REFERENCE",
@@ -86,5 +87,5 @@
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
 	 */
-	"vars": {  "BETTER_AUTH_URL": "https://moetomo-portofolio.stanleyreynara.workers.dev" }
+	"vars": { "ADMIN_EMAILS": "noellavonte@gmail.com,mogimoyu@gmail.com,hoshiumitoshi@gmail.com", "BETTER_AUTH_URL": "https://moetomo-portofolio.stanleyreynara.workers.dev" }
 }

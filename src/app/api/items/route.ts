@@ -1,3 +1,4 @@
+import { getAdminAccess } from "@/lib/admin-auth";
 // src/app/api/items/route.ts
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { drizzle } from "drizzle-orm/d1";
@@ -38,6 +39,8 @@ export async function POST(request: Request) {
   console.log("\n--- [START] POST /api/items ---");
   try {
     const { env } = await getCloudflareContext({ async: true });
+    const access = await getAdminAccess(env, request.headers);
+    if (!access.authorized) return Response.json({ error: access.error }, { status: access.status });
     const db = drizzle(env.DB, { schema });
     const formData = await request.formData();
 
@@ -115,6 +118,8 @@ export async function PATCH(request: Request) {
   console.log("\n--- [START] PATCH /api/items ---");
   try {
     const { env } = await getCloudflareContext({ async: true });
+    const access = await getAdminAccess(env, request.headers);
+    if (!access.authorized) return Response.json({ error: access.error }, { status: access.status });
     const db = drizzle(env.DB, { schema });
     const formData = await request.formData();
     
@@ -178,6 +183,8 @@ export async function PATCH(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const { env } = await getCloudflareContext({ async: true });
+    const access = await getAdminAccess(env, request.headers);
+    if (!access.authorized) return Response.json({ error: access.error }, { status: access.status });
     const db = drizzle(env.DB, { schema });
 
     type DeleteItem = { id: number };

@@ -1,3 +1,4 @@
+import { requireAdminPage } from "@/lib/admin-page";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { drizzle } from "drizzle-orm/d1";
 import { desc, count } from "drizzle-orm";
@@ -6,6 +7,7 @@ import * as schema from "@db/schema";
 export const dynamic = "force-dynamic"; // Ensures the dashboard always shows fresh data
 
 export default async function AdminDashboard() {
+  await requireAdminPage();
   // 1. Initialize DB from Cloudflare Context
   const { env } = await getCloudflareContext({ async: true });
   const db = drizzle(env.DB, { schema });

@@ -1,3 +1,4 @@
+import { getAdminAccess } from "@/lib/admin-auth";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { drizzle } from "drizzle-orm/d1";
 import { inArray, desc } from "drizzle-orm";
@@ -107,6 +108,8 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     const { env } = await getCloudflareContext({ async: true });
+    const access = await getAdminAccess(env, request.headers);
+    if (!access.authorized) return Response.json({ error: access.error }, { status: access.status });
     const db = drizzle(env.DB, { schema });
 
     // Fetches orders ordered by most recent first

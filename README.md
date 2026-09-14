@@ -4,7 +4,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-Read the documentation at https://opennext.js.org/cloudflare.
+Read the documentation at <https://opennext.js.org/cloudflare>.
 
 ## Develop
 
@@ -37,11 +37,21 @@ npm run deploy
 # or similar package manager command
 ```
 
-## Learn More
+## Admin access
 
-To learn more about Next.js, take a look at the following resources:
+Public signup is disabled, and the temporary setup page has been removed. Signing
+in does not grant admin access by itself. Set `ADMIN_EMAILS` to a comma-separated
+list of approved existing account emails. Matching is case-insensitive. Missing
+or empty configuration denies all admin access. Do not approve unknown accounts
+that may have registered while signup was public.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+For local development, add `ADMIN_EMAILS` to `.dev.vars` (see `.dev.vars.example`).
+The approved allowlist is configured in `wrangler.jsonc` for both production and
+development Workers and takes effect on deployment. Keep those entries and the
+local `.dev.vars` setting consistent when changing administrator access.
+This setting does not create accounts. Provision any new accounts through a trusted
+operator workflow; do not re-enable public signup. No database migration is needed.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Admin pages, order listing, and item/artist mutations require an authenticated
+allowlisted account. Public catalog reads, image reads, and order submission remain
+available to visitors.

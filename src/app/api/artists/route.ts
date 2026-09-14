@@ -1,3 +1,4 @@
+import { getAdminAccess } from "@/lib/admin-auth";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { drizzle } from "drizzle-orm/d1";
 import { eq, isNull } from "drizzle-orm";
@@ -29,6 +30,8 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const { env } = await getCloudflareContext({ async: true });
+    const access = await getAdminAccess(env, request.headers);
+    if (!access.authorized) return Response.json({ error: access.error }, { status: access.status });
   const db = drizzle(env.DB, { schema });
 
   type NewArtist = typeof schema.artists.$inferInsert;
@@ -44,6 +47,8 @@ export async function PATCH(request: Request) {
   
   try {
     const { env } = await getCloudflareContext({ async: true });
+    const access = await getAdminAccess(env, request.headers);
+    if (!access.authorized) return Response.json({ error: access.error }, { status: access.status });
     
     // Log environment bindings to ensure DB and BUCKET exist
     console.log("[ENV] Keys available:", Object.keys(env));
@@ -164,6 +169,8 @@ export async function PATCH(request: Request) {
 }
 export async function DELETE(request: Request) {
   const { env } = await getCloudflareContext({ async: true });
+    const access = await getAdminAccess(env, request.headers);
+    if (!access.authorized) return Response.json({ error: access.error }, { status: access.status });
   const db = drizzle(env.DB, { schema });
 
   type DeleteArtist = { id: number };

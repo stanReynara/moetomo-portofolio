@@ -1,3 +1,4 @@
+import { requireAdminPage } from "@/lib/admin-page";
 // src/app/admin/items/page.tsx
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { drizzle } from "drizzle-orm/d1";
@@ -9,6 +10,7 @@ import ItemsTable from "@/components/admin/ItemsTable"; // Assuming you have or 
 export const dynamic = "force-dynamic";
 
 export default async function AdminItemsPage() {
+  await requireAdminPage();
   // 1. Initialize DB from Cloudflare Context
   const { env } = await getCloudflareContext({ async: true });
   const db = drizzle(env.DB, { schema });
