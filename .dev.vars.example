@@ -1,0 +1,3 @@
+# Comma-separated existing account emails allowed to administer the site.
+# Empty or missing denies all admin access.
+ADMIN_EMAILS="email@email.com,email@email.com"

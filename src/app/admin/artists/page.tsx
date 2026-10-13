@@ -1,3 +1,4 @@
+import { requireAdminPage } from "@/lib/admin-page";
 // src/app/admin/artists/page.tsx
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { drizzle } from "drizzle-orm/d1";
@@ -9,6 +10,7 @@ import ArtistsTable from "@/components/admin/ArtistsTable";
 export const dynamic = "force-dynamic"; // Ensures we always see fresh D1 data
 
 export default async function AdminArtistsPage() {
+  await requireAdminPage();
   // 1. Initialize DB from Cloudflare Context
   const { env } = await getCloudflareContext({ async: true });
   const db = drizzle(env.DB, { schema });
