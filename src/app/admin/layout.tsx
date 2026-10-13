@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requireAdminPage } from "@/lib/admin-page";
 import { 
   LayoutDashboard, 
   ShoppingCart, 
@@ -8,11 +9,12 @@ import {
   Palette
 } from "lucide-react";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  await requireAdminPage();
   return (
     <div className="min-h-screen bg-base-200/30">
       {/* --- TOP NAVBAR --- */}

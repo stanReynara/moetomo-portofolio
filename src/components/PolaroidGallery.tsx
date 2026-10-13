@@ -30,15 +30,13 @@ export default async function PolaroidGallery() {
   return (
     <>
       {fetchedArtists.map((artist) => {
-        // Handle the leading slash issue. 
-        // (Tip: Change artist.avatar to artist.polaroid if you want the polaroids to show up here!)
-        const cleanPath = artist.avatar?.startsWith('/') 
-          ? artist.avatar 
-          : `/${artist.avatar}`;
+        // Older artist records store only the filename; uploads store the full object key.
+        const avatarKey = artist.avatar?.replace(/^\/+/, "") || "";
+        const avatarPath = avatarKey.includes("/") ? avatarKey : `avatars/${avatarKey}`;
 
         // Construct the final image source using the BUCKET_URL
         const finalImageSrc = artist.avatar 
-          ? `${BUCKET_URL}${cleanPath}` 
+          ? `${BUCKET_URL.replace(/\/+$/, "")}/${avatarPath}`
           : "/default-placeholder.png";
 
         return (
