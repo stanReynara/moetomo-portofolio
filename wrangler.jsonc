@@ -53,7 +53,8 @@
 	],
 	"env": {
     "development": {
-      "vars": { "ADMIN_EMAILS": "noellavonte@gmail.com,mogimoyu@gmail.com,hoshiumitoshi@gmail.com" },
+      "vars": { "ADMIN_EMAILS": "noellavonte@gmail.com,mogimoyu@gmail.com,hoshiumitoshi@gmail.com", "BETTER_AUTH_URL": "http://localhost:8787" },
+      "images": { "binding": "IMAGES" },
       "services": [
         {
           "binding": "WORKER_SELF_REFERENCE",
@@ -67,7 +68,13 @@
           "database_id": "5d4cb360-0469-404e-98fc-8bb44163ee6c",
           "migrations_dir": "./drizzle"
         }
-      ]
+      ],
+			"r2_buckets": [
+				{
+					"binding": "BUCKET",
+					"bucket_name": "moetomo-bucket-preview"
+				}
+			]
     }
   },
 	/**
