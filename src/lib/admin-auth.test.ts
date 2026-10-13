@@ -9,12 +9,16 @@ const { getSession, database, env } = vi.hoisted(() => ({
 vi.mock("./auth", () => ({ getAuth: () => ({ api: { getSession } }) }));
 vi.mock("@opennextjs/cloudflare", () => ({ getCloudflareContext: async () => ({ env }) }));
 vi.mock("drizzle-orm/d1", () => ({ drizzle: database }));
+vi.mock("next/headers", () => ({ headers: async () => new Headers() }));
+vi.mock("next/navigation", () => ({
+  redirect: (path: string) => { throw new Error(`redirect:${path}`); },
+  notFound: () => { throw new Error("not-found"); },
+}));
 import { getAdminAccess } from "./admin-auth";
 import * as items from "@/app/api/items/route";
 import * as artists from "@/app/api/artists/route";
 import * as orders from "@/app/api/orders/route";
-import middleware from "@/middleware";
-import { NextRequest } from "next/server";
+import AdminLayout from "@/app/admin/layout";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -62,11 +66,10 @@ it("allows an admin to list orders", async () => {
   expect(query.all).toHaveBeenCalled();
 });
 
-it.each(["/admin", "/admin/items", "/admin/orders", "/admin/artists"])("protects page %s", async (path) => {
-  const request = new NextRequest(`http://localhost${path}`);
-  expect((await middleware(request)).headers.get("location")).toBe("http://localhost/login");
+it("protects the shared admin layout", async () => {
+  await expect(AdminLayout({ children: null })).rejects.toThrow("redirect:/login");
   getSession.mockResolvedValue({ user: { email: "visitor@example.com" } });
-  expect((await middleware(request)).status).toBe(403);
+  await expect(AdminLayout({ children: null })).rejects.toThrow("not-found");
   getSession.mockResolvedValue({ user: { email: "admin@example.com" } });
-  expect((await middleware(request)).headers.get("x-middleware-next")).toBe("1");
+  await expect(AdminLayout({ children: null })).resolves.toBeDefined();
 });
