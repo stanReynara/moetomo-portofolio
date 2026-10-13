@@ -53,7 +53,11 @@
 	],
 	"env": {
     "development": {
-      "vars": { "ADMIN_EMAILS": "noellavonte@gmail.com,mogimoyu@gmail.com,hoshiumitoshi@gmail.com", "BETTER_AUTH_URL": "http://localhost:8787" },
+      "vars": { 
+				"ADMIN_EMAILS": "noellavonte@gmail.com,mogimoyu@gmail.com,hoshiumitoshi@gmail.com",
+				"BETTER_AUTH_URL": "http://localhost:8787",
+			 	"NEXT_PUBLIC_BUCKET_URL": "/api/bucket"
+			},
       "images": { "binding": "IMAGES" },
       "services": [
         {
@@ -94,5 +98,9 @@
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
 	 */
-	"vars": { "ADMIN_EMAILS": "noellavonte@gmail.com,mogimoyu@gmail.com,hoshiumitoshi@gmail.com", "BETTER_AUTH_URL": "https://moetomo-portofolio.stanleyreynara.workers.dev" }
+	"vars": { 
+		"ADMIN_EMAILS": "noellavonte@gmail.com,mogimoyu@gmail.com,hoshiumitoshi@gmail.com", 
+		"BETTER_AUTH_URL": "https://moetomo-portofolio.stanleyreynara.workers.dev", 
+		"NEXT_PUBLIC_BUCKET_URL": "https://moetomo-portofolio.stanleyreynara.workers.dev/api/bucket" 
+	}
 }
